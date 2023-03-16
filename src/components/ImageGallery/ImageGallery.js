@@ -1,41 +1,39 @@
-import { Component } from "react"
+import { useState } from "react"
 import PropTypes from "prop-types";
 
 import { ImageGalleryItem } from "components/ImageGalleryItem/ImageGalleryItem"
 import { Button } from "components/Button/Button"
 import { Modal } from "components/Modal/Modal";
 
-export class ImageGallery extends Component {
-    state = {
-      showModal: false,
-      largeImageUrl: null,
+export const ImageGallery = ({ hits, handleLoad }) => {
+  const [showModal, isShowModal] = useState(false);
+  const [largeImageUrl, isLargeImageUrl] = useState(null)
+  
+  const onOpen = (img) => {
+      console.log(img.largeImageURL)
+      isShowModal(true)
+      isLargeImageUrl(img.largeImageURL)
     };
   
-    onOpen = img => {
-      this.setState({ showModal: true, largeImageUrl: img.largeImageURL });
+    const onClose = () => {
+      isShowModal(false);
     };
   
-    onClose = () => {
-      this.setState({ showModal: false });
-    };
-  
-    render() {
-      const { hits, handleLoad } = this.props;
       return (
         <>
-          <ImageGalleryItem imgs={hits} onOpen={this.onOpen} />
+          <ImageGalleryItem imgs={hits} onOpen={onOpen} />
           {hits.length > 0 && <Button onClick={handleLoad} />}
-          {this.state.showModal && (
+          {showModal && (
             <Modal
-              src={this.state.largeImageUrl}
+              src={largeImageUrl}
               alt="image"
-              onClose={this.onClose}
+              onClose={onClose}
             />
           )}
         </>
       );
     }
-  }
+  // }
 
 ImageGallery.propTypes = {
     showModal: PropTypes.bool,

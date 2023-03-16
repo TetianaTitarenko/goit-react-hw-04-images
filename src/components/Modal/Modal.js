@@ -17,14 +17,14 @@ export class Modal extends Component {
       this.props.onClose()
     }
   }
-  handleDfckdropClick = e => {
+  handleBackdropClick = e => {
     if(e.currentTarget === e.target) {
       this.props.onClose()
     }
   }
 
   render() {
-  return createPortal(<div className={css.Overlay} onClick={this.handleDfckdropClick}>
+  return createPortal(<div className={css.Overlay} onClick={this.handleBackdropClick}>
     <div className={css.Modal}>
     <img src={this.props.src} alt=""/>
     </div>
