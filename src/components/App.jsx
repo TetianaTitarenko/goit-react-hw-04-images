@@ -1,4 +1,4 @@
-import { Component } from "react";
+import {useState, useEffect } from "react";
 import toast, { Toaster } from 'react-hot-toast';
 import { Searchbar } from "./Searchbar/Searchbar";
 import { ImageGallery } from "./ImageGallery/ImageGallery";
@@ -7,28 +7,25 @@ import { Loader } from "./Loader/Loader";
 import PropTypes from "prop-types";
 
 
-export class App extends Component {
-  state = {
-    textSearch: '',
-    page: 1,
-    hits: [],
-    loading: false
+export const App = () => {
+  const [textSearch, setTextSearch] = useState('');
+  const [page, setPage] = useState(1);
+  const [hits, setHits] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const handleSubmit = textSearch => {
+    setPage(1);
+    setHits([]);
+    setTextSearch(textSearch);
   };
+  useEffect(() => {
+    if (!textSearch) {
+      return
+    }
+    setLoading(true);
 
-  handleSubmit = textSearch => {
-    this.setState({ page: 1, hits: [] });
-    this.setState({ textSearch });
-  };
-
-  componentDidUpdate(prevProps, prevState) {
-    const {textSearch, page, hits } = this.state
-    if (
-      prevState.textSearch !== textSearch ||
-      prevState.page !== page
-    ) {
-      this.setState({loading: true });
-      getImg(textSearch, page)
-        .then(response => {
+    getImg(textSearch, page,
+    )
+      .then(response => {
           if (response.ok) {
             return response.json();
           }
@@ -39,34 +36,28 @@ export class App extends Component {
           if (imgs.hits.length === 0) {
             return toast.error('No such image');
           }
-          return this.setState({
-            hits: [...hits, ...imgs.hits],
-          });
+          return setHits(
+            prefHits => [...prefHits, ...imgs.hits],
+          );
         })
-        .catch(error => this.setState({ error }))
-        .finally(() => this.setState({loading: false}));
-    }
-  }
-
-  handleLoad = () => {
-    this.setState(prev => ({ page: prev.page + 1 }));
+        .catch(error => console.log(error))
+      .finally(() => setLoading(false));
+  }, [textSearch, page])
+  const handleLoad = () => {
+    setPage(prefPage => prefPage + 1 );
   };
-
-  render() {
-    const{loading, hits, textSearch} = this.state
     return (
       <div>
         <Toaster/>
-        <Searchbar onSearch={this.handleSubmit} />
-        {loading && <Loader/>}
-        <ImageGallery
+        <Searchbar onSearch={handleSubmit} />
+        {loading && <Loader />}
+        {textSearch && <ImageGallery
           hits={hits}
           value={textSearch}
-          handleLoad={this.handleLoad}
-        />
+          handleLoad={handleLoad}
+        />}
       </div>
     );
-  }
 }
 
 App.propTypes = {
